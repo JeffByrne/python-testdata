@@ -15,9 +15,9 @@ class Factory(object):
         if not self._element_amount:
             raise MissingElementAmountValue("missing element_amount for {}".format(self.__class__))
         self._has_started = True
-        
+
         return self
-    
+
     def next(self):
         if self.current_index >= self.element_amount:
             raise StopIteration
@@ -40,7 +40,7 @@ class Factory(object):
     @property
     def element_amount(self):
         return self._element_amount
-    
+
     def set_element_amount(self, new_element_amount):
         if self._has_started:
             raise FactoryStartedAlready("can't change 'element_amount' if factory has started")
@@ -88,7 +88,7 @@ class DependentField(Factory):
 
     def __call__(self):
         # if we are missing depending fields values
-        self._check_missing_fields(set(self.depending_field_names), set(self._depending_fields.keys())) 
+        self._check_missing_fields(set(self.depending_field_names), set(self._depending_fields.keys()))
 
     @property
     def depending_field_names(self):
@@ -100,7 +100,7 @@ class DependentField(Factory):
 
 class ListFactory(Factory):
     """
-    A factory that returns on each iteration a list of `elements_per_list` items returned 
+    A factory that returns on each iteration a list of `elements_per_list` items returned
     from calls to the given factory.
 
     Example,
@@ -135,12 +135,13 @@ class Callable(Factory):
     >>> list(Callable(lambda: 'foo').generate(4))
     ['foo', 'foo', 'foo', 'foo']
     """
-    def __init__(self, callable_obj ):
+    def __init__(self, callable_obj, **kwargs):
         super(Callable, self).__init__()
         self._callable_obj = callable_obj
+        self.kwargs = kwargs
 
     def __call__(self):
-        return self._callable_obj()
+        return self._callable_obj(**self.kwargs)
 
 class DependentCallable(DependentField):
     """
